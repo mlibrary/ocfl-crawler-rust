@@ -1,0 +1,13 @@
+{
+  "name": "Dev Container",
+  "dockerComposeFile": "../compose.yaml",
+  "service": "app",
+  "workspaceFolder": "/usr/src/app",
+  "customizations": {
+    "rustrover.aiAssistant": {
+      "extensions": [
+        "JetBrains.ai-assistant"
+      ]
+    },
+  },
+}

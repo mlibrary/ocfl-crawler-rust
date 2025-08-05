@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - cargo-cache:/home/app/.cargo/registry
+    environment:
+      - CARGO_HOME=/usr/src/app/target
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null  # Keeps container running
+    user: "${UID:-1000}:${GID:-1000}"  # Matches host user permissions
+
+volumes:
+  cargo-cache:  # Persistent cargo cache to speed up builds
