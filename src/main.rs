@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use clap::Parser;
-use crawler::find_matches;
+use ocfl_crawler_rust::find_matches;
 
 #[derive(Parser)]
 struct Cli {

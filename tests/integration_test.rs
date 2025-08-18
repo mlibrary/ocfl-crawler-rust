@@ -1,4 +1,4 @@
-use crawler::find_matches;
+use ocfl_crawler_rust::find_matches;
 
 #[test]
 fn find_a_match() {
@@ -23,7 +23,7 @@ fn crawl_touch() {
     std::fs::write(&path, "lorem ipsum\ndolor sit amet\n").expect("write temp file");
 
     // Invoke the compiled binary produced by Cargo for this package
-    let exe = env!("CARGO_BIN_EXE_crawler");
+    let exe = env!("CARGO_BIN_EXE_ocfl-crawler-rust");
     let output = std::process::Command::new(exe)
         .arg("lorem")
         .arg(&path)
