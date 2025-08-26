@@ -5,7 +5,7 @@ use pretty_assertions::assert_eq;
 use rand::{distr::Alphanumeric, Rng};
 use std::{borrow::Cow, fs, path::Path};
 
-const PRG: &str = "findr";
+const PRG: &str = "ocfl-crawler-rust";
 
 // --------------------------------------------------
 fn gen_bad_file() -> String {
@@ -59,14 +59,6 @@ fn dies_bad_type() -> Result<()> {
 }
 
 // --------------------------------------------------
-#[cfg(windows)]
-fn format_file_name(expected_file: &str) -> Cow<str> {
-    // Equivalent to: Cow::Owned(format!("{}.windows", expected_file))
-    format!("{}.windows", expected_file).into()
-}
-
-// --------------------------------------------------
-#[cfg(not(windows))]
 fn format_file_name(expected_file: &str) -> Cow<str> {
     // Equivalent to: Cow::Borrowed(expected_file)
     expected_file.into()
@@ -95,48 +87,48 @@ fn run(args: &[&str], expected_file: &str) -> Result<()> {
 // --------------------------------------------------
 #[test]
 fn path1() -> Result<()> {
-    run(&["tests/findr/inputs"], "tests/findr/expected/path1.txt")
+    run(&["tests/cli/inputs"], "tests/cli/expected/path1.txt")
 }
 
 // --------------------------------------------------
 #[test]
 fn path_a() -> Result<()> {
-    run(&["tests/findr/inputs/a"], "tests/findr/expected/path_a.txt")
+    run(&["tests/cli/inputs/a"], "tests/cli/expected/path_a.txt")
 }
 
 // --------------------------------------------------
 #[test]
 fn path_a_b() -> Result<()> {
-    run(&["tests/findr/inputs/a/b"], "tests/findr/expected/path_a_b.txt")
+    run(&["tests/cli/inputs/a/b"], "tests/cli/expected/path_a_b.txt")
 }
 
 // --------------------------------------------------
 #[test]
 fn path_d() -> Result<()> {
-    run(&["tests/findr/inputs/d"], "tests/findr/expected/path_d.txt")
+    run(&["tests/cli/inputs/d"], "tests/cli/expected/path_d.txt")
 }
 
 // --------------------------------------------------
 #[test]
 fn path_a_b_d() -> Result<()> {
     run(
-        &["tests/findr/inputs/a/b", "tests/findr/inputs/d"],
-        "tests/findr/expected/path_a_b_d.txt",
+        &["tests/cli/inputs/a/b", "tests/cli/inputs/d"],
+        "tests/cli/expected/path_a_b_d.txt",
     )
 }
 
 // --------------------------------------------------
 #[test]
 fn type_f() -> Result<()> {
-    run(&["tests/findr/inputs", "-t", "f"], "tests/findr/expected/type_f.txt")
+    run(&["tests/cli/inputs", "-t", "f"], "tests/cli/expected/type_f.txt")
 }
 
 // --------------------------------------------------
 #[test]
 fn type_f_path_a() -> Result<()> {
     run(
-        &["tests/findr/inputs/a", "-t", "f"],
-        "tests/findr/expected/type_f_path_a.txt",
+        &["tests/cli/inputs/a", "-t", "f"],
+        "tests/cli/expected/type_f_path_a.txt",
     )
 }
 
@@ -144,8 +136,8 @@ fn type_f_path_a() -> Result<()> {
 #[test]
 fn type_f_path_a_b() -> Result<()> {
     run(
-        &["tests/findr/inputs/a/b", "--type", "f"],
-        "tests/findr/expected/type_f_path_a_b.txt",
+        &["tests/cli/inputs/a/b", "--type", "f"],
+        "tests/cli/expected/type_f_path_a_b.txt",
     )
 }
 
@@ -153,8 +145,8 @@ fn type_f_path_a_b() -> Result<()> {
 #[test]
 fn type_f_path_d() -> Result<()> {
     run(
-        &["tests/findr/inputs/d", "--type", "f"],
-        "tests/findr/expected/type_f_path_d.txt",
+        &["tests/cli/inputs/d", "--type", "f"],
+        "tests/cli/expected/type_f_path_d.txt",
     )
 }
 
@@ -162,23 +154,23 @@ fn type_f_path_d() -> Result<()> {
 #[test]
 fn type_f_path_a_b_d() -> Result<()> {
     run(
-        &["tests/findr/inputs/a/b", "tests/findr/inputs/d", "--type", "f"],
-        "tests/findr/expected/type_f_path_a_b_d.txt",
+        &["tests/cli/inputs/a/b", "tests/cli/inputs/d", "--type", "f"],
+        "tests/cli/expected/type_f_path_a_b_d.txt",
     )
 }
 
 // --------------------------------------------------
 #[test]
 fn type_d() -> Result<()> {
-    run(&["tests/findr/inputs", "-t", "d"], "tests/findr/expected/type_d.txt")
+    run(&["tests/cli/inputs", "-t", "d"], "tests/cli/expected/type_d.txt")
 }
 
 // --------------------------------------------------
 #[test]
 fn type_d_path_a() -> Result<()> {
     run(
-        &["tests/findr/inputs/a", "-t", "d"],
-        "tests/findr/expected/type_d_path_a.txt",
+        &["tests/cli/inputs/a", "-t", "d"],
+        "tests/cli/expected/type_d_path_a.txt",
     )
 }
 
@@ -186,8 +178,8 @@ fn type_d_path_a() -> Result<()> {
 #[test]
 fn type_d_path_a_b() -> Result<()> {
     run(
-        &["tests/findr/inputs/a/b", "--type", "d"],
-        "tests/findr/expected/type_d_path_a_b.txt",
+        &["tests/cli/inputs/a/b", "--type", "d"],
+        "tests/cli/expected/type_d_path_a_b.txt",
     )
 }
 
@@ -195,8 +187,8 @@ fn type_d_path_a_b() -> Result<()> {
 #[test]
 fn type_d_path_d() -> Result<()> {
     run(
-        &["tests/findr/inputs/d", "--type", "d"],
-        "tests/findr/expected/type_d_path_d.txt",
+        &["tests/cli/inputs/d", "--type", "d"],
+        "tests/cli/expected/type_d_path_d.txt",
     )
 }
 
@@ -204,23 +196,23 @@ fn type_d_path_d() -> Result<()> {
 #[test]
 fn type_d_path_a_b_d() -> Result<()> {
     run(
-        &["tests/findr/inputs/a/b", "tests/findr/inputs/d", "--type", "d"],
-        "tests/findr/expected/type_d_path_a_b_d.txt",
+        &["tests/cli/inputs/a/b", "tests/cli/inputs/d", "--type", "d"],
+        "tests/cli/expected/type_d_path_a_b_d.txt",
     )
 }
 
 // --------------------------------------------------
 #[test]
 fn type_l() -> Result<()> {
-    run(&["tests/findr/inputs", "-t", "l"], "tests/findr/expected/type_l.txt")
+    run(&["tests/cli/inputs", "-t", "l"], "tests/cli/expected/type_l.txt")
 }
 
 // --------------------------------------------------
 #[test]
 fn type_f_l() -> Result<()> {
     run(
-        &["tests/findr/inputs", "-t", "l", "f"],
-        "tests/findr/expected/type_f_l.txt",
+        &["tests/cli/inputs", "-t", "l", "f"],
+        "tests/cli/expected/type_f_l.txt",
     )
 }
 
@@ -228,8 +220,8 @@ fn type_f_l() -> Result<()> {
 #[test]
 fn name_csv() -> Result<()> {
     run(
-        &["tests/findr/inputs", "-n", ".*[.]csv"],
-        "tests/findr/expected/name_csv.txt",
+        &["tests/cli/inputs", "-n", ".*[.]csv"],
+        "tests/cli/expected/name_csv.txt",
     )
 }
 
@@ -237,8 +229,8 @@ fn name_csv() -> Result<()> {
 #[test]
 fn name_csv_mp3() -> Result<()> {
     run(
-        &["tests/findr/inputs", "-n", ".*[.]csv", "-n", ".*[.]mp3"],
-        "tests/findr/expected/name_csv_mp3.txt",
+        &["tests/cli/inputs", "-n", ".*[.]csv", "-n", ".*[.]mp3"],
+        "tests/cli/expected/name_csv_mp3.txt",
     )
 }
 
@@ -246,23 +238,23 @@ fn name_csv_mp3() -> Result<()> {
 #[test]
 fn name_txt_path_a_d() -> Result<()> {
     run(
-        &["tests/findr/inputs/a", "tests/findr/inputs/d", "--name", ".*.txt"],
-        "tests/findr/expected/name_txt_path_a_d.txt",
+        &["tests/cli/inputs/a", "tests/cli/inputs/d", "--name", ".*.txt"],
+        "tests/cli/expected/name_txt_path_a_d.txt",
     )
 }
 
 // --------------------------------------------------
 #[test]
 fn name_a() -> Result<()> {
-    run(&["tests/findr/inputs", "-n", "a"], "tests/findr/expected/name_a.txt")
+    run(&["tests/cli/inputs", "-n", "a"], "tests/cli/expected/name_a.txt")
 }
 
 // --------------------------------------------------
 #[test]
 fn type_f_name_a() -> Result<()> {
     run(
-        &["tests/findr/inputs", "-t", "f", "-n", "a"],
-        "tests/findr/expected/type_f_name_a.txt",
+        &["tests/cli/inputs", "-t", "f", "-n", "a"],
+        "tests/cli/expected/type_f_name_a.txt",
     )
 }
 
@@ -270,22 +262,22 @@ fn type_f_name_a() -> Result<()> {
 #[test]
 fn type_d_name_a() -> Result<()> {
     run(
-        &["tests/findr/inputs", "--type", "d", "--name", "a"],
-        "tests/findr/expected/type_d_name_a.txt",
+        &["tests/cli/inputs", "--type", "d", "--name", "a"],
+        "tests/cli/expected/type_d_name_a.txt",
     )
 }
 
 // --------------------------------------------------
 #[test]
 fn path_g() -> Result<()> {
-    run(&["tests/findr/inputs/g.csv"], "tests/findr/expected/path_g.txt")
+    run(&["tests/cli/inputs/g.csv"], "tests/cli/expected/path_g.txt")
 }
 
 // --------------------------------------------------
 #[test]
 #[cfg(not(windows))]
 fn unreadable_dir() -> Result<()> {
-    let dirname = "tests/findr/inputs/cant-touch-this";
+    let dirname = "tests/cli/inputs/cant-touch-this";
     if !Path::new(dirname).exists() {
         fs::create_dir(dirname)?;
     }
@@ -296,7 +288,7 @@ fn unreadable_dir() -> Result<()> {
         .expect("failed");
 
     let cmd = Command::cargo_bin(PRG)?
-        .arg("tests/findr/inputs")
+        .arg("tests/cli/inputs")
         .assert()
         .success();
     fs::remove_dir(dirname)?;

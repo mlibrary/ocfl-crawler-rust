@@ -1,0 +1,2 @@
+tests/cli/inputs/d
+tests/cli/inputs/d/e

@@ -1,0 +1,1 @@
+tests/cli/inputs/a/a.txt

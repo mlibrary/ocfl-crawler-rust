@@ -1,0 +1,3 @@
+tests/cli/inputs/a/a.txt
+tests/cli/inputs/a/b/b.csv
+tests/cli/inputs/a/b/c/c.mp3

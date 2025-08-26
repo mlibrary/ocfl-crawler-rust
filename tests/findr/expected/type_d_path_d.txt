@@ -1,2 +1,0 @@
-tests/findr/inputs/d
-tests/findr/inputs/d/e

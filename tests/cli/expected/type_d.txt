@@ -1,0 +1,7 @@
+tests/cli/inputs
+tests/cli/inputs/a
+tests/cli/inputs/a/b
+tests/cli/inputs/a/b/c
+tests/cli/inputs/d
+tests/cli/inputs/d/e
+tests/cli/inputs/f

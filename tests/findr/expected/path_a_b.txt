@@ -1,4 +1,0 @@
-tests/findr/inputs/a/b
-tests/findr/inputs/a/b/b.csv
-tests/findr/inputs/a/b/c
-tests/findr/inputs/a/b/c/c.mp3
