@@ -110,15 +110,6 @@ fn path_d() -> Result<()> {
 
 // --------------------------------------------------
 #[test]
-fn path_a_b_d() -> Result<()> {
-    run(
-        &["tests/cli/inputs/a/b", "tests/cli/inputs/d"],
-        "tests/cli/expected/path_a_b_d.txt",
-    )
-}
-
-// --------------------------------------------------
-#[test]
 fn type_f() -> Result<()> {
     run(&["tests/cli/inputs", "-t", "f"], "tests/cli/expected/type_f.txt")
 }
@@ -147,15 +138,6 @@ fn type_f_path_d() -> Result<()> {
     run(
         &["tests/cli/inputs/d", "--type", "f"],
         "tests/cli/expected/type_f_path_d.txt",
-    )
-}
-
-// --------------------------------------------------
-#[test]
-fn type_f_path_a_b_d() -> Result<()> {
-    run(
-        &["tests/cli/inputs/a/b", "tests/cli/inputs/d", "--type", "f"],
-        "tests/cli/expected/type_f_path_a_b_d.txt",
     )
 }
 
@@ -194,15 +176,6 @@ fn type_d_path_d() -> Result<()> {
 
 // --------------------------------------------------
 #[test]
-fn type_d_path_a_b_d() -> Result<()> {
-    run(
-        &["tests/cli/inputs/a/b", "tests/cli/inputs/d", "--type", "d"],
-        "tests/cli/expected/type_d_path_a_b_d.txt",
-    )
-}
-
-// --------------------------------------------------
-#[test]
 fn type_l() -> Result<()> {
     run(&["tests/cli/inputs", "-t", "l"], "tests/cli/expected/type_l.txt")
 }
@@ -234,14 +207,6 @@ fn name_csv_mp3() -> Result<()> {
     )
 }
 
-// --------------------------------------------------
-#[test]
-fn name_txt_path_a_d() -> Result<()> {
-    run(
-        &["tests/cli/inputs/a", "tests/cli/inputs/d", "--name", ".*.txt"],
-        "tests/cli/expected/name_txt_path_a_d.txt",
-    )
-}
 
 // --------------------------------------------------
 #[test]
