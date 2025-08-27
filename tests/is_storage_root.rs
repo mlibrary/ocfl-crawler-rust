@@ -36,12 +36,12 @@ fn is_storage_root_detects_markers() {
 
     // Add 1.0 marker => true
     let marker_10 = dir.join("0=ocfl_1.0");
-    fs::write(&marker_10, b"0=ocfl_1.0\n").expect("failed to create 0=ocfl_1.0");
+    fs::write(&marker_10, b"ocfl_1.0\n").expect("failed to create 0=ocfl_1.0");
     let contents_10 = fs::read_to_string(&marker_10).expect("failed to read 0=ocfl_1.0");
     assert_eq!(
         contents_10,
-        "0=ocfl_1.0\n",
-        "0=ocfl_1.0 contents must be the filename plus newline"
+        "ocfl_1.0\n",
+        "0=ocfl_1.0 contents must be the `ocfl_1.0\\n`"
     );
     assert!(
         is_storage_root(&dir),
@@ -51,12 +51,12 @@ fn is_storage_root_detects_markers() {
 
     // Add 1.1 marker => true
     let marker_11 = dir.join("0=ocfl_1.1");
-    fs::write(&marker_11, b"0=ocfl_1.1\n").expect("failed to create 0=ocfl_1.1");
+    fs::write(&marker_11, b"ocfl_1.1\n").expect("failed to create 0=ocfl_1.1");
     let contents_11 = fs::read_to_string(&marker_11).expect("failed to read 0=ocfl_1.1");
     assert_eq!(
         contents_11,
-        "0=ocfl_1.1\n",
-        "0=ocfl_1.1 contents must be the filename plus newline"
+        "ocfl_1.1\n",
+        "0=ocfl_1.1 contents must be the 'ocfl_1.1\\n'"
     );
     assert!(
         is_storage_root(&dir),

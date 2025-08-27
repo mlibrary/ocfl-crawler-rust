@@ -1,3 +1,0 @@
-storage root: tests/cli/1.0
-storage root: tests/cli/1.1
-tests/cli/1.2 is not a storage root

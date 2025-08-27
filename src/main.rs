@@ -1,8 +1,8 @@
 use anyhow::Result;
 use clap::{builder::PossibleValue, ArgAction, Parser, ValueEnum};
-use ocfl_crawler_rust::is_storage_root;
+use ocfl_crawler_rust::{is_object_root, is_storage_root};
 use regex::Regex;
-use walkdir::DirEntry;
+use walkdir::{DirEntry, WalkDir};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
@@ -83,9 +83,27 @@ fn run(args: Args) -> Result<()> {
             .any(|re| re.is_match(&entry.file_name().to_string_lossy()))
     };
 
+    let object_filter = |entry: &DirEntry| {
+        is_object_root(entry.path())
+    };
+
     for path in &args.paths {
         if is_storage_root(path) {
             println!("storage root: {path}");
+            let entries = WalkDir::new(path)
+                .min_depth(1)
+                .into_iter()
+                .filter_map(|e| match e {
+                    Err(e) => {
+                        eprintln!("{e}");
+                        None
+                    }
+                    Ok(entry) => Some(entry),
+                })
+                .filter(object_filter)
+                .map(|entry| entry.path().display().to_string())
+                .collect::<Vec<_>>();
+            println!("object root: {}", entries.join("--"));
         } else {
             eprintln!("{path} is not a storage root");
         }

@@ -17,8 +17,9 @@ pub fn is_storage_root<P: AsRef<Path>>(path: P) -> bool {
         return false;
     }
 
-    ["0=ocfl_1.0", "0=ocfl_1.1"].iter().any(|name| {
-        let marker_path = p.join(name);
+    ["ocfl_1.0", "ocfl_1.1"].iter().any(|name| {
+        let filename = format!("0={}", name);
+        let marker_path = p.join(filename);
         if !marker_path.is_file() {
             return false;
         }
@@ -38,11 +39,15 @@ pub fn is_object_root<P: AsRef<Path>>(path: P) -> bool {
         return false;
     }
 
-    ["0=ocfl_object_1.0", "0=ocfl_object_1.1"].iter().any(|name| {
-        let marker_path = p.join(name);
+    // return false;
+
+    ["ocfl_object_1.0", "ocfl_object_1.1"].iter().any(|name| {
+        let filename = format!("0={}", name);
+        let marker_path = p.join(filename);
         if !marker_path.is_file() {
             return false;
         }
+        // return true;
         match std::fs::read_to_string(&marker_path) {
             Ok(contents) => contents == format!("{}\n", name),
             Err(_) => false,
