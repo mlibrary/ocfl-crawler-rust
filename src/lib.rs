@@ -8,8 +8,8 @@ pub fn is_directory<P: AsRef<Path>>(path: P) -> bool {
     path.as_ref().is_dir()
 }
 
-/// Returns true if `path` is a directory and contains an OCFL storage root marker file
-/// ("0=ocfl_1.0" or "0=ocfl_1.1") whose contents are exactly the filename followed by a newline.
+/// Returns true if `path` is a directory and contains a single OCFL storage root marker file
+/// ("0=ocfl_1.0" xor "0=ocfl_1.1") whose contents are "ocfl_1.0\n" and "ocfl_1.1\n" respectively.
 pub fn is_storage_root<P: AsRef<Path>>(path: P) -> bool {
     let p = path.as_ref();
 
@@ -17,21 +17,33 @@ pub fn is_storage_root<P: AsRef<Path>>(path: P) -> bool {
         return false;
     }
 
-    ["ocfl_1.0", "ocfl_1.1"].iter().any(|name| {
-        let filename = format!("0={}", name);
-        let marker_path = p.join(filename);
-        if !marker_path.is_file() {
-            return false;
-        }
-        match std::fs::read_to_string(&marker_path) {
-            Ok(contents) => contents == format!("{}\n", name),
+    let marker_10 = p.join("0=ocfl_1.0");
+    let marker_11 = p.join("0=ocfl_1.1");
+
+    let exists_10 = marker_10.is_file();
+    let exists_11 = marker_11.is_file();
+
+    // Require exactly one marker file to be present (exclusive or).
+    if exists_10 == exists_11 {
+        return false;
+    }
+
+    if exists_10 {
+        match std::fs::read_to_string(&marker_10) {
+            Ok(contents) => contents == "ocfl_1.0\n",
             Err(_) => false,
         }
-    })
+    } else {
+        match std::fs::read_to_string(&marker_11) {
+            Ok(contents) => contents == "ocfl_1.1\n",
+            Err(_) => false,
+        }
+    }
 }
 
-/// Returns true if `path` is a directory and contains an OCFL object root marker file
-/// ("0=ocfl_object_1.0" or "0=ocfl_object_1.1") whose contents are exactly the filename followed by a newline.
+/// Returns true if `path` is a directory and contains a single OCFL object root marker file
+/// ("0=ocfl_object_1.0" xor "0=ocfl_object_1.1") whose contents are "ocfl_object_1.0\n" and "ocfl_object_1.1\n" respectively,
+/// and also contains an `inventory.json` file.
 pub fn is_object_root<P: AsRef<Path>>(path: P) -> bool {
     let p = path.as_ref();
 
@@ -39,18 +51,32 @@ pub fn is_object_root<P: AsRef<Path>>(path: P) -> bool {
         return false;
     }
 
-    // return false;
+    let marker_10 = p.join("0=ocfl_object_1.0");
+    let marker_11 = p.join("0=ocfl_object_1.1");
 
-    ["ocfl_object_1.0", "ocfl_object_1.1"].iter().any(|name| {
-        let filename = format!("0={}", name);
-        let marker_path = p.join(filename);
-        if !marker_path.is_file() {
-            return false;
-        }
-        // return true;
-        match std::fs::read_to_string(&marker_path) {
-            Ok(contents) => contents == format!("{}\n", name),
+    let exists_10 = marker_10.is_file();
+    let exists_11 = marker_11.is_file();
+
+    // Require exactly one marker file to be present (exclusive or).
+    if exists_10 == exists_11 {
+        return false;
+    }
+
+    // Object roots must include an inventory.json file
+    let inventory = p.join("inventory.json");
+    if !inventory.is_file() {
+        return false;
+    }
+
+    if exists_10 {
+        match std::fs::read_to_string(&marker_10) {
+            Ok(contents) => contents == "ocfl_object_1.0\n",
             Err(_) => false,
         }
-    })
+    } else {
+        match std::fs::read_to_string(&marker_11) {
+            Ok(contents) => contents == "ocfl_object_1.1\n",
+            Err(_) => false,
+        }
+    }
 }

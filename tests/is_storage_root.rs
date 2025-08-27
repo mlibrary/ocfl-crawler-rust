@@ -47,9 +47,8 @@ fn is_storage_root_detects_markers() {
         is_storage_root(&dir),
         "directory with 0=ocfl_1.0 should be a storage root"
     );
-    fs::remove_file(&marker_10).expect("failed to remove 0=ocfl_1.0");
 
-    // Add 1.1 marker => true
+    // Add 1.1 marker => false
     let marker_11 = dir.join("0=ocfl_1.1");
     fs::write(&marker_11, b"ocfl_1.1\n").expect("failed to create 0=ocfl_1.1");
     let contents_11 = fs::read_to_string(&marker_11).expect("failed to read 0=ocfl_1.1");
@@ -58,6 +57,13 @@ fn is_storage_root_detects_markers() {
         "ocfl_1.1\n",
         "0=ocfl_1.1 contents must be the 'ocfl_1.1\\n'"
     );
+    assert!(
+        !is_storage_root(&dir),
+        "directory with 0=ocfl_1.0 and 0=ocfl_1.1 should not be a storage root"
+    );
+
+    // Remove 1.0 marker so there is only the 1.1 marker => true
+    fs::remove_file(&marker_10).expect("failed to remove 0=ocfl_1.0");
     assert!(
         is_storage_root(&dir),
         "directory with 0=ocfl_1.1 should be a storage root"

@@ -66,7 +66,7 @@ fn main() {
 
 // --------------------------------------------------
 fn run(args: Args) -> Result<()> {
-    let type_filter = |entry: &DirEntry| {
+    let _type_filter = |entry: &DirEntry| {
         args.entry_types.is_empty()
             || args.entry_types.iter().any(|entry_type| match entry_type {
             EntryType::Link => entry.file_type().is_symlink(),
@@ -75,7 +75,7 @@ fn run(args: Args) -> Result<()> {
         })
     };
 
-    let name_filter = |entry: &DirEntry| {
+    let _name_filter = |entry: &DirEntry| {
         args.names.is_empty()
             || args
             .names
