@@ -103,7 +103,9 @@ fn run(args: Args) -> Result<()> {
                 .filter(object_filter)
                 .map(|entry| entry.path().display().to_string())
                 .collect::<Vec<_>>();
-            println!("object root: {}", entries.join("--"));
+            for entry in &entries {
+                println!("object root: {}", entry);
+            }
         } else {
             eprintln!("{path} is not a storage root");
         }

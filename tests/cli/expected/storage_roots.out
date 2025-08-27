@@ -1,4 +1,6 @@
 storage root: tests/cli/1.0
-object root: tests/cli/1.0/minimal_one_version_one_file--tests/cli/1.0/minimal_no_content
+object root: tests/cli/1.0/minimal_one_version_one_file
+object root: tests/cli/1.0/minimal_no_content
 storage root: tests/cli/1.1
-object root: tests/cli/1.1/minimal_one_version_one_file--tests/cli/1.1/minimal_no_content
+object root: tests/cli/1.1/minimal_one_version_one_file
+object root: tests/cli/1.1/minimal_no_content
