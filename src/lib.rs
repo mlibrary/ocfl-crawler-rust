@@ -80,3 +80,33 @@ pub fn is_object_root<P: AsRef<Path>>(path: P) -> bool {
         }
     }
 }
+
+/// Returns object id from inventory.json in the OCFL object root directory.
+pub fn get_object_id<P: AsRef<Path>>(path: P) -> Result<String, std::io::Error> {
+    let p = path.as_ref();
+
+    if !is_object_root(p) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "Not an OCFL object root",
+        ));
+    }
+
+    let inventory_path = p.join("inventory.json");
+    let inventory_content = std::fs::read_to_string(inventory_path)?;
+
+    // Parse JSON and extract the "id" field safely.
+    let json: serde_json::Value = serde_json::from_str(&inventory_content)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+
+    if let Some(id) = json.get("id").and_then(|v| v.as_str()) {
+        if !id.is_empty() {
+            return Ok(id.to_string());
+        }
+    }
+
+    Err(std::io::Error::new(
+        std::io::ErrorKind::InvalidData,
+        "Could not find valid 'id' field in inventory.json",
+    ))
+}
