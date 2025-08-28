@@ -126,7 +126,7 @@ pub fn object_to_json<P: AsRef<Path>>(path: P, root: P) -> String {
     let rel_path = path.as_ref().display().to_string();
     // let abs_path = path.as_ref().canonicalize().unwrap();
     // let path_str = abs_path.display().to_string();
-    let rel_root = root.as_ref().display().to_string();
+    let _rel_root = root.as_ref().display().to_string();
     // let abs_root = root.as_ref().canonicalize().unwrap();
     // let root_str = abs_root.display().to_string();
     let cwd_abs = std::fs::canonicalize(std::env::current_dir().unwrap()).unwrap().display().to_string();
