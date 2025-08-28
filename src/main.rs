@@ -1,7 +1,8 @@
 use anyhow::Result;
 use clap::{builder::PossibleValue, ArgAction, Parser, ValueEnum};
-use ocfl_crawler_rust::{is_object_root, is_storage_root};
+use ocfl_crawler_rust::{get_object_id, is_object_root, is_storage_root, DirGuard};
 use regex::Regex;
+use std::path::Path;
 use walkdir::{DirEntry, WalkDir};
 
 #[derive(Debug, Parser)]
@@ -89,8 +90,10 @@ fn run(args: Args) -> Result<()> {
 
     for path in &args.paths {
         if is_storage_root(path) {
-            println!("storage root: {path}");
-            let entries = WalkDir::new(path)
+            let _guard = DirGuard::change_to(path)?;
+
+            // println!("storage root: {path}");
+            let entries = WalkDir::new(".")
                 .min_depth(1)
                 .into_iter()
                 .filter_map(|e| match e {
@@ -101,15 +104,48 @@ fn run(args: Args) -> Result<()> {
                     Ok(entry) => Some(entry),
                 })
                 .filter(object_filter)
-                .map(|entry| entry.path().display().to_string())
+                .map(|entry| object_to_json(entry.path().display().to_string(), path.to_string()))
                 .collect::<Vec<_>>();
             for entry in &entries {
-                println!("object root: {}", entry);
+                println!("{}", entry);
             }
         } else {
-            eprintln!("{path} is not a storage root");
+            let abs_path = Path::new(path).canonicalize().unwrap();
+            let path_str = abs_path.display().to_string();
+            eprintln!("{path_str} is not a storage root");
         }
     }
 
     Ok(())
 }
+
+
+pub fn object_to_json<P: AsRef<Path>>(path: P, root: P) -> String {
+
+    // path.as_ref().display().to_string()
+    let rel_path = path.as_ref().display().to_string();
+    // let abs_path = path.as_ref().canonicalize().unwrap();
+    // let path_str = abs_path.display().to_string();
+    let rel_root = root.as_ref().display().to_string();
+    // let abs_root = root.as_ref().canonicalize().unwrap();
+    // let root_str = abs_root.display().to_string();
+    let cwd_abs = std::fs::canonicalize(std::env::current_dir().unwrap()).unwrap().display().to_string();
+    let id_str = get_object_id(path).unwrap_or_else(|_| String::from(""));
+    String::from(format!("{{ \"storage\": \"{cwd_abs}\", \"object\": \"{rel_path}\", \"id\": \"{id_str}\" }}"))
+}
+
+// // Usage
+// fn main() -> io::Result<()> {
+//     let before = env::current_dir()?;
+//     println!("Before: {}", before.display());
+//
+//     {
+//         let _guard = DirGuard::change_to("/tmp")?;
+//         // CWD is now /tmp
+//         println!("Inside: {}", env::current_dir()?.display());
+//         // When `_guard` goes out of scope, CWD is restored automatically.
+//     }
+//
+//     println!("After: {}", env::current_dir()?.display());
+//     Ok(())
+// }
