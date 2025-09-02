@@ -55,3 +55,30 @@ fn storage_roots_absolute() -> Result<()> {
     )
 }
 
+#[test]
+fn storage_roots_identifier() -> Result<()> {
+    run(
+        &["list", "--identifier", "tests/cli/1.0", "tests/cli/1.1", "tests/cli/1.2"],
+        "tests/cli/expected/storage_roots_identifier.out",
+        "tests/cli/expected/storage_roots.err",
+    )
+}
+
+#[test]
+fn storage_roots_key() -> Result<()> {
+    run(
+        &["list", "--key", "tests/cli/1.0", "tests/cli/1.1", "tests/cli/1.2"],
+        "tests/cli/expected/storage_roots_key.out",
+        "tests/cli/expected/storage_roots.err",
+    )
+}
+
+#[test]
+fn storage_roots_namespace() -> Result<()> {
+    run(
+        &["list", "--namespace", "ns1", "tests/cli/1.0", "tests/cli/1.1", "tests/cli/1.2"],
+        "tests/cli/expected/storage_roots_namespace.out",
+        "tests/cli/expected/storage_roots.err",
+    )
+}
+
