@@ -2,6 +2,7 @@ use anyhow::{anyhow, Result};
 use clap::{builder::PossibleValue, ArgAction, Parser, Subcommand, ValueEnum};
 use ocfl_crawler_rust::{get_object_id, is_object_root, is_storage_root, DirGuard};
 use regex::Regex;
+use serde_json::{Map, Value};
 use std::path::Path;
 use walkdir::{DirEntry, WalkDir};
 
@@ -49,6 +50,22 @@ struct ListCmd {
         num_args(0..)
     )]
     entry_types: Vec<EntryType>,
+
+    /// Namespace to include in output
+    #[arg(long, value_name = "NAMESPACE")]
+    namespace: Option<String>,
+
+    /// Emit absolute object paths
+    #[arg(long)]
+    absolute: bool,
+
+    /// Include storage key in output
+    #[arg(long)]
+    key: bool,
+
+    /// Include identifier in output
+    #[arg(long)]
+    identifier: bool,
 }
 
 #[derive(Debug, clap::Args)]
@@ -130,7 +147,15 @@ fn run_list(args: ListCmd) -> Result<()> {
                     Ok(entry) => Some(entry),
                 })
                 .filter(object_filter)
-                .map(|entry| object_to_json(entry.path().display().to_string()))
+                .map(|entry| {
+                    object_to_json(
+                        entry.path().display().to_string(),
+                        args.absolute,
+                        args.key,
+                        args.identifier,
+                        args.namespace.as_deref(),
+                    )
+                })
                 .collect::<Vec<_>>();
             for entry in &entries {
                 println!("{}", entry);
@@ -156,31 +181,54 @@ fn run_info(args: InfoCmd) -> Result<()> {
     }
 
     // Use current directory as "storage" context for the output
-    println!("{}", object_to_json(p));
+    // Preserve previous behavior: absolute path + identifier, no key.
+    println!("{}", object_to_json(p, true, false, true, None));
     Ok(())
 }
 
-pub fn object_to_json<P: AsRef<Path>>(path: P) -> String {
-    // path.as_ref().display().to_string()
-    // let rel_path = path.as_ref().display().to_string();
-    let path_abs = path
-        .as_ref()
-        .canonicalize()
-        .unwrap()
-        .display()
-        .to_string();
-    // let path_str = abs_path.display().to_string();
-    // let _rel_root = root.as_ref().display().to_string();
-    // let abs_root = root.as_ref().canonicalize().unwrap();
-    // let root_str = abs_root.display().to_string();
-    // let cwd_abs = std::fs::canonicalize(std::env::current_dir().unwrap())
-    //     .unwrap()
-    //     .display()
-    //     .to_string();
-    let id_str = get_object_id(path).unwrap_or_else(|_| String::from(""));
-    String::from(format!(
-        "{{ \"object_root\": \"{path_abs}\", \"id\": \"{id_str}\" }}"
-    ))
+pub fn object_to_json<P: AsRef<Path>>(
+    path: P,
+    absolute: bool,
+    key: bool,
+    identifier: bool,
+    namespace: Option<&str>,
+) -> String {
+    let path_ref = path.as_ref();
+
+    // Decide whether to emit absolute or as-given path.
+    let path_str = if absolute {
+        path_ref
+            .canonicalize()
+            .unwrap_or_else(|_| path_ref.to_path_buf())
+            .display()
+            .to_string()
+    } else {
+        path_ref.display().to_string()
+    };
+
+    // Build JSON dynamically to avoid emitting empty fields.
+    let mut obj = Map::new();
+    obj.insert("path".to_string(), Value::String(path_str));
+
+    if let Some(ns) = namespace {
+        obj.insert("namespace".to_string(), Value::String(ns.to_string()));
+    }
+
+    if key {
+        let key_str = path_ref
+            .file_name()
+            .and_then(|s| s.to_str())
+            .unwrap_or("")
+            .to_string();
+        obj.insert("key".to_string(), Value::String(key_str));
+    }
+
+    if identifier {
+        let id_str = get_object_id(path_ref).unwrap_or_else(|_| String::from(""));
+        obj.insert("id".to_string(), Value::String(id_str));
+    }
+
+    Value::Object(obj).to_string()
 }
 
 // // Usage
