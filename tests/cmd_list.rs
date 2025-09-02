@@ -46,3 +46,12 @@ fn storage_roots() -> Result<()> {
     run(&["list", "tests/cli/1.0", "tests/cli/1.1", "tests/cli/1.2"], "tests/cli/expected/storage_roots.out", "tests/cli/expected/storage_roots.err")
 }
 
+#[test]
+fn storage_roots_absolute() -> Result<()> {
+    run(
+        &["list", "--absolute", "tests/cli/1.0", "tests/cli/1.1", "tests/cli/1.2"],
+        "tests/cli/expected/storage_roots_absolute.out",
+        "tests/cli/expected/storage_roots.err",
+    )
+}
+
