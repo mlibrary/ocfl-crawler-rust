@@ -1,14 +1,29 @@
-use anyhow::Result;
-use clap::{builder::PossibleValue, ArgAction, Parser, ValueEnum};
+use anyhow::{anyhow, Result};
+use clap::{builder::PossibleValue, ArgAction, Parser, Subcommand, ValueEnum};
 use ocfl_crawler_rust::{get_object_id, is_object_root, is_storage_root, DirGuard};
 use regex::Regex;
 use std::path::Path;
 use walkdir::{DirEntry, WalkDir};
 
 #[derive(Debug, Parser)]
-#[command(author, version, about)]
+#[command(author, version, about, propagate_version = true)]
 /// OCFL crawler in Rust
-struct Args {
+struct Cli {
+    /// Command to execute
+    #[command(subcommand)]
+    command: Command,
+}
+
+#[derive(Debug, Subcommand)]
+enum Command {
+    /// List OCFL objects under one or more storage roots
+    List(ListCmd),
+    /// Show info for a single OCFL object root
+    Info(InfoCmd),
+}
+
+#[derive(Debug, clap::Args)]
+struct ListCmd {
     /// OCFL Storage Root path(s)
     #[arg(value_name = "PATH", default_value = ".")]
     paths: Vec<String>,
@@ -36,6 +51,13 @@ struct Args {
     entry_types: Vec<EntryType>,
 }
 
+#[derive(Debug, clap::Args)]
+struct InfoCmd {
+    /// Path to an OCFL object root (directory containing inventory.json)
+    #[arg(value_name = "PATH")]
+    path: String,
+}
+
 #[derive(Debug, Eq, PartialEq, Clone)]
 enum EntryType {
     Dir,
@@ -59,14 +81,21 @@ impl ValueEnum for EntryType {
 
 // --------------------------------------------------
 fn main() {
-    if let Err(e) = run(Args::parse()) {
+    let cli = Cli::parse();
+
+    let result = match cli.command {
+        Command::List(args) => run_list(args),
+        Command::Info(args) => run_info(args),
+    };
+
+    if let Err(e) = result {
         eprintln!("{}", e);
         std::process::exit(1);
     }
 }
 
 // --------------------------------------------------
-fn run(args: Args) -> Result<()> {
+fn run_list(args: ListCmd) -> Result<()> {
     let _type_filter = |entry: &DirEntry| {
         args.entry_types.is_empty()
             || args.entry_types.iter().any(|entry_type| match entry_type {
@@ -84,15 +113,12 @@ fn run(args: Args) -> Result<()> {
             .any(|re| re.is_match(&entry.file_name().to_string_lossy()))
     };
 
-    let object_filter = |entry: &DirEntry| {
-        is_object_root(entry.path())
-    };
+    let object_filter = |entry: &DirEntry| is_object_root(entry.path());
 
     for path in &args.paths {
         if is_storage_root(path) {
             let _guard = DirGuard::change_to(path)?;
 
-            // println!("storage root: {path}");
             let entries = WalkDir::new(".")
                 .min_depth(1)
                 .into_iter()
@@ -104,7 +130,7 @@ fn run(args: Args) -> Result<()> {
                     Ok(entry) => Some(entry),
                 })
                 .filter(object_filter)
-                .map(|entry| object_to_json(entry.path().display().to_string(), path.to_string()))
+                .map(|entry| object_to_json(entry.path().display().to_string()))
                 .collect::<Vec<_>>();
             for entry in &entries {
                 println!("{}", entry);
@@ -119,19 +145,42 @@ fn run(args: Args) -> Result<()> {
     Ok(())
 }
 
+fn run_info(args: InfoCmd) -> Result<()> {
+    let p = Path::new(&args.path);
+    if !is_object_root(p) {
+        let abs = p.canonicalize().unwrap_or_else(|_| p.to_path_buf());
+        return Err(anyhow!(format!(
+            "{} is not an OCFL object root",
+            abs.display()
+        )));
+    }
 
-pub fn object_to_json<P: AsRef<Path>>(path: P, root: P) -> String {
+    // Use current directory as "storage" context for the output
+    println!("{}", object_to_json(p));
+    Ok(())
+}
 
+pub fn object_to_json<P: AsRef<Path>>(path: P) -> String {
     // path.as_ref().display().to_string()
-    let rel_path = path.as_ref().display().to_string();
-    // let abs_path = path.as_ref().canonicalize().unwrap();
+    // let rel_path = path.as_ref().display().to_string();
+    let path_abs = path
+        .as_ref()
+        .canonicalize()
+        .unwrap()
+        .display()
+        .to_string();
     // let path_str = abs_path.display().to_string();
-    let _rel_root = root.as_ref().display().to_string();
+    // let _rel_root = root.as_ref().display().to_string();
     // let abs_root = root.as_ref().canonicalize().unwrap();
     // let root_str = abs_root.display().to_string();
-    let cwd_abs = std::fs::canonicalize(std::env::current_dir().unwrap()).unwrap().display().to_string();
+    // let cwd_abs = std::fs::canonicalize(std::env::current_dir().unwrap())
+    //     .unwrap()
+    //     .display()
+    //     .to_string();
     let id_str = get_object_id(path).unwrap_or_else(|_| String::from(""));
-    String::from(format!("{{ \"storage\": \"{cwd_abs}\", \"object\": \"{rel_path}\", \"id\": \"{id_str}\" }}"))
+    String::from(format!(
+        "{{ \"object_root\": \"{path_abs}\", \"id\": \"{id_str}\" }}"
+    ))
 }
 
 // // Usage
