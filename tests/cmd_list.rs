@@ -1,6 +1,7 @@
 use anyhow::Result;
 use assert_cmd::Command;
 use pretty_assertions::assert_eq;
+use serde_json::Value;
 use std::{borrow::Cow, fs};
 
 const PRG: &str = "ocfl-crawler-rust";
@@ -16,7 +17,7 @@ fn format_file_name(expected_file: &str) -> Cow<str> {
 fn run(args: &[&str], expected_file_out: &str, expected_file_err: &str) -> Result<()> {
     let file_out = format_file_name(expected_file_out);
     let contents_out = fs::read_to_string(file_out.as_ref())?;
-    let expected_out: Vec<&str> =
+    let expected_out_lines: Vec<&str> =
         contents_out.split('\n').filter(|s| !s.is_empty()).collect();
 
     let file_err = format_file_name(expected_file_err);
@@ -33,7 +34,17 @@ fn run(args: &[&str], expected_file_out: &str, expected_file_err: &str) -> Resul
     let lines_err: Vec<&str> =
         stderr.split('\n').filter(|s| !s.is_empty()).collect();
 
-    assert_eq!(lines_out, expected_out);
+    // Compare stdout as JSON values so object field order doesn't matter
+    let expected_json: Vec<Value> = expected_out_lines
+        .iter()
+        .map(|s| serde_json::from_str::<Value>(s).expect("Invalid JSON in expected stdout"))
+        .collect();
+    let actual_json: Vec<Value> = lines_out
+        .iter()
+        .map(|s| serde_json::from_str::<Value>(s).expect("Invalid JSON in actual stdout"))
+        .collect();
+
+    assert_eq!(actual_json, expected_json);
     assert_eq!(lines_err, expected_err);
 
     Ok(())

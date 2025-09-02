@@ -1,4 +1,4 @@
-{"path":"./minimal_one_version_one_file","namespace":"ns1"}
+{"namespace":"ns1","path":"./minimal_one_version_one_file"}
 {"path":"./minimal_no_content","namespace":"ns1"}
 {"path":"./minimal_one_version_one_file","namespace":"ns1"}
-{"path":"./minimal_no_content","namespace":"ns1"}
+{"namespace":"ns1","path":"./minimal_no_content"}

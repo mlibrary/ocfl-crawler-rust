@@ -1,4 +1,4 @@
 {"path":"./minimal_one_version_one_file","key":"minimal_one_version_one_file"}
-{"path":"./minimal_no_content","key":"minimal_no_content"}
-{"path":"./minimal_one_version_one_file","key":"minimal_one_version_one_file"}
+{"key":"minimal_no_content","path":"./minimal_no_content"}
+{"key":"minimal_one_version_one_file","path":"./minimal_one_version_one_file"}
 {"path":"./minimal_no_content","key":"minimal_no_content"}
