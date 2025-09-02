@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use clap::{builder::PossibleValue, ArgAction, Parser, Subcommand, ValueEnum};
 use ocfl_crawler_rust::{get_object_id, is_object_root, is_storage_root, DirGuard};
 use regex::Regex;
-use serde_json::{Map, Value};
+use serde_json::to_string;
 use std::path::Path;
 use walkdir::{DirEntry, WalkDir};
 
@@ -206,12 +206,17 @@ pub fn object_to_json<P: AsRef<Path>>(
         path_ref.display().to_string()
     };
 
-    // Build JSON dynamically to avoid emitting empty fields.
-    let mut obj = Map::new();
-    obj.insert("path".to_string(), Value::String(path_str));
+    // Build JSON manually to control key order: path, id, key, namespace.
+    let mut parts: Vec<String> = Vec::new();
 
-    if let Some(ns) = namespace {
-        obj.insert("namespace".to_string(), Value::String(ns.to_string()));
+    // Always include path first.
+    let path_json = to_string(&path_str).unwrap();
+    parts.push(format!("\"path\":{}", path_json));
+
+    if identifier {
+        let id_str = get_object_id(path_ref).unwrap_or_else(|_| String::from(""));
+        let id_json = to_string(&id_str).unwrap();
+        parts.push(format!("\"id\":{}", id_json));
     }
 
     if key {
@@ -220,15 +225,16 @@ pub fn object_to_json<P: AsRef<Path>>(
             .and_then(|s| s.to_str())
             .unwrap_or("")
             .to_string();
-        obj.insert("key".to_string(), Value::String(key_str));
+        let key_json = to_string(&key_str).unwrap();
+        parts.push(format!("\"key\":{}", key_json));
     }
 
-    if identifier {
-        let id_str = get_object_id(path_ref).unwrap_or_else(|_| String::from(""));
-        obj.insert("id".to_string(), Value::String(id_str));
+    if let Some(ns) = namespace {
+        let ns_json = to_string(ns).unwrap();
+        parts.push(format!("\"namespace\":{}", ns_json));
     }
 
-    Value::Object(obj).to_string()
+    format!("{{{}}}", parts.join(","))
 }
 
 // // Usage

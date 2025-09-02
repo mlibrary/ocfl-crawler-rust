@@ -56,6 +56,25 @@ fn storage_roots_absolute() -> Result<()> {
 }
 
 #[test]
+fn storage_roots_all_options() -> Result<()> {
+    run(
+        &[
+            "list",
+            "--absolute",
+            "--identifier",
+            "--key",
+            "--namespace",
+            "ns1",
+            "tests/cli/1.0",
+            "tests/cli/1.1",
+            "tests/cli/1.2",
+        ],
+        "tests/cli/expected/storage_roots_all.out",
+        "tests/cli/expected/storage_roots.err",
+    )
+}
+
+#[test]
 fn storage_roots_identifier() -> Result<()> {
     run(
         &["list", "--identifier", "tests/cli/1.0", "tests/cli/1.1", "tests/cli/1.2"],
