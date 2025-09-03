@@ -1,6 +1,6 @@
-use anyhow::{anyhow, Result};
-use clap::{builder::PossibleValue, ArgAction, Parser, Subcommand, ValueEnum};
-use ocfl_crawler_rust::{get_object_id, is_object_root, is_storage_root, DirGuard};
+use anyhow::{Result, anyhow};
+use clap::{ArgAction, Parser, Subcommand, ValueEnum, builder::PossibleValue};
+use ocfl_crawler_rust::{DirGuard, get_object_id, is_object_root, is_storage_root};
 use regex::Regex;
 use serde_json::to_string;
 use std::path::Path;
@@ -116,18 +116,18 @@ fn run_list(args: ListCmd) -> Result<()> {
     let _type_filter = |entry: &DirEntry| {
         args.entry_types.is_empty()
             || args.entry_types.iter().any(|entry_type| match entry_type {
-            EntryType::Link => entry.file_type().is_symlink(),
-            EntryType::Dir => entry.file_type().is_dir(),
-            EntryType::File => entry.file_type().is_file(),
-        })
+                EntryType::Link => entry.file_type().is_symlink(),
+                EntryType::Dir => entry.file_type().is_dir(),
+                EntryType::File => entry.file_type().is_file(),
+            })
     };
 
     let _name_filter = |entry: &DirEntry| {
         args.names.is_empty()
             || args
-            .names
-            .iter()
-            .any(|re| re.is_match(&entry.file_name().to_string_lossy()))
+                .names
+                .iter()
+                .any(|re| re.is_match(&entry.file_name().to_string_lossy()))
     };
 
     let object_filter = |entry: &DirEntry| is_object_root(entry.path());

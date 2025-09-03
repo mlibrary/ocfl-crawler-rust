@@ -28,7 +28,10 @@ fn is_directory_test() {
 
     fs::create_dir(&dir).expect("failed to create test directory");
 
-    assert!(is_directory(&dir), "expected the created path to be a directory");
+    assert!(
+        is_directory(&dir),
+        "expected the created path to be a directory"
+    );
 
     fs::remove_dir(&dir).expect("failed to remove test directory");
 

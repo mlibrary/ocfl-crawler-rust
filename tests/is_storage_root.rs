@@ -39,8 +39,7 @@ fn is_storage_root_detects_markers() {
     fs::write(&marker_10, b"ocfl_1.0\n").expect("failed to create 0=ocfl_1.0");
     let contents_10 = fs::read_to_string(&marker_10).expect("failed to read 0=ocfl_1.0");
     assert_eq!(
-        contents_10,
-        "ocfl_1.0\n",
+        contents_10, "ocfl_1.0\n",
         "0=ocfl_1.0 contents must be the `ocfl_1.0\\n`"
     );
     assert!(
@@ -53,8 +52,7 @@ fn is_storage_root_detects_markers() {
     fs::write(&marker_11, b"ocfl_1.1\n").expect("failed to create 0=ocfl_1.1");
     let contents_11 = fs::read_to_string(&marker_11).expect("failed to read 0=ocfl_1.1");
     assert_eq!(
-        contents_11,
-        "ocfl_1.1\n",
+        contents_11, "ocfl_1.1\n",
         "0=ocfl_1.1 contents must be the 'ocfl_1.1\\n'"
     );
     assert!(

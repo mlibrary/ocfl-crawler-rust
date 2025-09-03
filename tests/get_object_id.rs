@@ -32,7 +32,6 @@ fn get_object_id_from_inventory_json() {
     let marker = dir.join("0=ocfl_object_1.1");
     fs::write(&marker, b"ocfl_object_1.1\n").expect("failed to create object marker");
 
-
     // Add empty inventory.json file
     let inventory = dir.join("inventory.json");
     fs::write(&inventory, b"{}").expect("failed to create inventory.json");
