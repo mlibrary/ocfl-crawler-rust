@@ -106,7 +106,7 @@ fn main() {
     };
 
     if let Err(e) = result {
-        eprintln!("{}", e);
+        eprintln!("{e}");
         std::process::exit(1);
     }
 }
@@ -158,7 +158,7 @@ fn run_list(args: ListCmd) -> Result<()> {
                 })
                 .collect::<Vec<_>>();
             for entry in &entries {
-                println!("{}", entry);
+                println!("{entry}");
             }
         } else {
             let abs_path = Path::new(path).canonicalize().unwrap();
@@ -211,12 +211,12 @@ pub fn object_to_json<P: AsRef<Path>>(
 
     // Always include path first.
     let path_json = to_string(&path_str).unwrap();
-    parts.push(format!("\"path\":{}", path_json));
+    parts.push(format!("\"path\":{path_json}"));
 
     if identifier {
         let id_str = get_object_id(path_ref).unwrap_or_else(|_| String::from(""));
         let id_json = to_string(&id_str).unwrap();
-        parts.push(format!("\"id\":{}", id_json));
+        parts.push(format!("\"id\":{id_json}"));
     }
 
     if key {
@@ -226,12 +226,12 @@ pub fn object_to_json<P: AsRef<Path>>(
             .unwrap_or("")
             .to_string();
         let key_json = to_string(&key_str).unwrap();
-        parts.push(format!("\"key\":{}", key_json));
+        parts.push(format!("\"key\":{key_json}"));
     }
 
     if let Some(ns) = namespace {
         let ns_json = to_string(ns).unwrap();
-        parts.push(format!("\"namespace\":{}", ns_json));
+        parts.push(format!("\"namespace\":{ns_json}"));
     }
 
     format!("{{{}}}", parts.join(","))

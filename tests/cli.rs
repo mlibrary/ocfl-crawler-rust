@@ -1,26 +1,25 @@
 use anyhow::Result;
 use assert_cmd::Command;
-use predicates::prelude::*;
+// use predicates::prelude::*;
 use pretty_assertions::assert_eq;
-use rand::{distr::Alphanumeric, Rng};
 use std::{borrow::Cow, fs};
 
 const PRG: &str = "ocfl-crawler-rust";
 
-// --------------------------------------------------
-fn gen_bad_file() -> String {
-    loop {
-        let filename: String = rand::rng()
-            .sample_iter(Alphanumeric)
-            .take(7)
-            .map(char::from)
-            .collect();
-
-        if fs::metadata(&filename).is_err() {
-            return filename;
-        }
-    }
-}
+// // --------------------------------------------------
+// fn gen_bad_file() -> String {
+//     loop {
+//         let filename: String = rand::rng()
+//             .sample_iter(Alphanumeric)
+//             .take(7)
+//             .map(char::from)
+//             .collect();
+//
+//         if fs::metadata(&filename).is_err() {
+//             return filename;
+//         }
+//     }
+// }
 //
 // // --------------------------------------------------
 // #[test]
