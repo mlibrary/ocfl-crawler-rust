@@ -1,5 +1,4 @@
 use anyhow::Result;
-use assert_cmd::Command;
 // use predicates::prelude::*;
 use pretty_assertions::assert_eq;
 use std::{borrow::Cow, fs};
@@ -73,7 +72,7 @@ fn run(args: &[&str], expected_file_out: &str, expected_file_err: &str) -> Resul
     let contents_err = fs::read_to_string(file_err.as_ref())?;
     let expected_err: Vec<&str> = contents_err.split('\n').filter(|s| !s.is_empty()).collect();
 
-    let cmd = Command::cargo_bin(PRG)?.args(args).assert().success();
+    let cmd = Command::v(PRG)?.args(args).assert();
     let out = cmd.get_output();
     let stdout = String::from_utf8(out.stdout.clone())?;
     let stderr = String::from_utf8(out.stderr.clone())?;
